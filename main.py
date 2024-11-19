@@ -10,9 +10,12 @@ from langchain.agents import initialize_agent
 from langchain.callbacks import get_openai_callback
 
 from tools import get_current_user_tool, get_recent_transactions_tool
-from utils import display_instructions, display_logo
+from utils import display_instructions, display_logo, get_secret
 
 load_dotenv()
+
+# Get OpenAI API key from Secret Manager
+openai_api_key = get_secret("openai-api-key")
 
 # Initialise tools
 tools = [get_current_user_tool, get_recent_transactions_tool]
@@ -85,6 +88,3 @@ if prompt := st.chat_input(placeholder="Show my recent transactions"):
 
 display_instructions()
 display_logo()
-
-
-        

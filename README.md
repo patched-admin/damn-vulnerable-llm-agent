@@ -46,7 +46,7 @@ To build and run the Docker image:
 docker build -t dvla .
 
 # Populate the env.list with necessary environment variables (just the OpenAI API key), then run:
-docker run --env-file env.list -p 8501:8501 dvla
+docker run --env-file env.list -p 8080:8080 dvla
 
 ```
 

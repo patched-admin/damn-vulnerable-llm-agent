@@ -1,5 +1,7 @@
 import streamlit as st
 import base64
+from google.cloud import secretmanager
+import os
 
 def display_instructions():
     # Markdown with some basic CSS styles for the box
@@ -49,6 +51,30 @@ def get_image_base64(path):
     with open(path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
     return encoded_string
+
+def get_secret(secret_id: str, version_id: str = "latest") -> str:
+    """
+    Retrieve a secret from Google Cloud Secret Manager.
+    
+    Args:
+        secret_id: The ID of the secret to retrieve
+        version_id: The version of the secret to retrieve (default: "latest")
+    
+    Returns:
+        The secret value as a string
+    """
+    try:
+        project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
+        if not project_id:
+            raise ValueError("GOOGLE_CLOUD_PROJECT environment variable not set")
+
+        client = secretmanager.SecretManagerServiceClient()
+        name = f"projects/{project_id}/secrets/{secret_id}/versions/{version_id}"
+        response = client.access_secret_version(request={"name": name})
+        return response.payload.data.decode("UTF-8")
+    except Exception as e:
+        st.error(f"Error retrieving secret: {str(e)}")
+        raise
 
 def display_logo():
     # Convert your image
