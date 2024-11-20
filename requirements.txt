@@ -1,5 +1,9 @@
 streamlit
+fastapi
+uvicorn
 langchain==0.0.306
 openai==0.28.1
+sse-starlette
+aiohttp
 google-cloud-secret-manager>=2.16.1
 python-dotenv

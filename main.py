@@ -1,4 +1,3 @@
-import langchain
 import streamlit as st
 from dotenv import load_dotenv
 from langchain.agents import ConversationalChatAgent, AgentExecutor
@@ -6,8 +5,6 @@ from langchain.callbacks import StreamlitCallbackHandler
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
-from langchain.agents import initialize_agent
-from langchain.callbacks import get_openai_callback
 
 from tools import get_current_user_tool, get_recent_transactions_tool
 from utils import display_instructions, display_logo, get_secret
@@ -39,7 +36,10 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 msgs = StreamlitChatMessageHistory()
 memory = ConversationBufferMemory(
-    chat_memory=msgs, return_messages=True, memory_key="chat_history", output_key="output"
+    chat_memory=msgs,
+    return_messages=True,
+    memory_key="chat_history",
+    output_key="output",
 )
 
 if len(msgs.messages) == 0:
@@ -54,7 +54,9 @@ for idx, msg in enumerate(msgs.messages):
         for step in st.session_state.steps.get(str(idx), []):
             if step[0].tool == "_Exception":
                 continue
-            with st.status(f"**{step[0].tool}**: {step[0].tool_input}", state="complete"):
+            with st.status(
+                f"**{step[0].tool}**: {step[0].tool_input}", state="complete"
+            ):
                 st.write(step[0].log)
                 st.write(step[1])
         st.write(msg.content)
@@ -62,13 +64,12 @@ for idx, msg in enumerate(msgs.messages):
 if prompt := st.chat_input(placeholder="Show my recent transactions"):
     st.chat_message("user").write(prompt)
 
-    llm = ChatOpenAI(
-        model_name="gpt-4-1106-preview",
-        temperature=0, streaming=True
-    )
+    llm = ChatOpenAI(model_name="gpt-4-1106-preview", temperature=0, streaming=True)
     tools = tools
 
-    chat_agent = ConversationalChatAgent.from_llm_and_tools(llm=llm, tools=tools, verbose=True, system_message=system_msg)
+    chat_agent = ConversationalChatAgent.from_llm_and_tools(
+        llm=llm, tools=tools, verbose=True, system_message=system_msg
+    )
 
     executor = AgentExecutor.from_agent_and_tools(
         agent=chat_agent,
@@ -77,14 +78,17 @@ if prompt := st.chat_input(placeholder="Show my recent transactions"):
         return_intermediate_steps=True,
         handle_parsing_errors=True,
         verbose=True,
-        max_iterations=6
+        max_iterations=6,
     )
     with st.chat_message("assistant"):
         st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
         response = executor(prompt, callbacks=[st_cb])
         st.write(response["output"])
-        st.session_state.steps[str(len(msgs.messages) - 1)] = response["intermediate_steps"]
+        st.session_state.steps[str(len(msgs.messages) - 1)] = response[
+            "intermediate_steps"
+        ]
 
 
 display_instructions()
 display_logo()
+
