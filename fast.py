@@ -44,7 +44,7 @@ async def generate_response(message: str, conversation_id: str):
     tools = [get_current_user_tool, get_recent_transactions_tool]
     memory = get_memory(conversation_id)
 
-    llm = ChatOpenAI(model_name="gpt-4-1106-preview", temperature=0, streaming=True)
+    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, streaming=True)
 
     chat_agent = ConversationalChatAgent.from_llm_and_tools(
         llm=llm, tools=tools, verbose=True, system_message=SYSTEM_MSG
